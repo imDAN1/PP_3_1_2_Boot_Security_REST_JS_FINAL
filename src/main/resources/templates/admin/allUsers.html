@@ -1,0 +1,54 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>All users</title>
+</head>
+<body>
+
+<div>
+  <table>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Surname</th>
+      <th>Age</th>
+      <th>Email</th>
+    </tr>
+    <tr th:each = "list : ${users}">
+      <td th:utext="${list.getId()}"/>
+      <td th:utext="${list.getName()}"/>
+      <td th:utext="${list.getPassword()}"/>
+      <td th:utext="${list.getSurName()}"/>
+      <td th:utext="${list.getAge()}"/>
+      <td th:utext="${list.getEmail()}"/>
+      <td th:utext="${list.getRoles()}"/>
+      <td>
+        <form action = "#" th:action="@{/{id}/edit(id=${list.getId()})}" method = "PATCH">
+          <input type = "submit" value = "Update">
+        </form>
+      </td>
+
+      <td>
+        <form th:method = "DELETE" th:action="@{/{id}/delete(id=${list.getId()})}">
+          <input type = "submit" value = "Delete">
+        </form>
+      </td>
+
+    </tr>
+  </table>
+
+  <br/>
+
+  <hr/>
+
+  <form th:method = "GET" th:action = "@{/admin/registration}">
+    <input type="submit" value = "Add new user">
+  </form>
+
+  <form th:method="POST" th:action="@{/logout}">
+    <input type="submit" value="Logout"/>
+  </form>
+</div>
+
+</body>
+</html>
