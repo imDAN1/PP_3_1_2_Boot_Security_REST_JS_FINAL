@@ -1,10 +1,12 @@
 package ru.kata.spring.boot_security.demo.model;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -98,6 +100,15 @@ public class User implements UserDetails {
         this.age = age;
     }
 
+    public User(String username, String surName, String email, int age, String password, Set<Role> roles) {
+        this.username = username;
+        this.surName = surName;
+        this.email = email;
+        this.age = age;
+        this.password = password;
+        this.roles = roles;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -111,7 +122,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
     }
 
     @Override

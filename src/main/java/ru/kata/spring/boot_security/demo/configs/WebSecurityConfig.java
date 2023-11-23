@@ -35,22 +35,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                /*
-Хотел реализовать свою страницу входа с возможностью регистрации нового пользователя
-Изучил теорию, но работать авторизация не стала почему-то
-Сохранение пользователей с выбранной ролью проходит хорошо
-В итоге оставил базовую страницу для ввода логина и пароля
-                 */
-//                .loginPage("/auth/login")
-//                .loginProcessingUrl("/process_login")
-//                .defaultSuccessUrl("/", true)
-//                .failureForwardUrl("/auth/login?error")
+                .loginPage("/auth/login")
+                .loginProcessingUrl("/process_login")
+                .defaultSuccessUrl("/", true)
+                .failureForwardUrl("/auth/login?error")
                 .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login");
+                .logoutSuccessUrl("/auth/login");
     }
 
 //    // аутентификация inMemory

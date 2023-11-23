@@ -5,24 +5,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repositories.RolesRepository;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminsController {
     private final UserService userService;
-    private final RolesRepository rolesRepository;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminsController(UserService userService, RolesRepository rolesRepository) {
+    public AdminsController(UserService userService, RoleService roleService) {
         this.userService = userService;
-        this.rolesRepository = rolesRepository;
+        this.roleService = roleService;
     }
 
     @GetMapping
@@ -33,8 +31,7 @@ public class AdminsController {
 
     @GetMapping("/registration")
     public String addUser(@ModelAttribute("user") User user, Model model) {
-        List<Role> roles = (List<Role>) rolesRepository.findAll();
-        model.addAttribute("allRoles", roles);
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "/auth/registration";
     }
 
@@ -50,8 +47,7 @@ public class AdminsController {
     public String edit(Model model, @PathVariable("id") Long id) {
         User user = userService.readUser(id);
         model.addAttribute("user", user);
-        List<Role> roles = (List<Role>) rolesRepository.findAll();
-        model.addAttribute("allRoles", roles);
+        model.addAttribute("allRoles", roleService.getAllRoles());
 
         return "/admin/edit";
     }

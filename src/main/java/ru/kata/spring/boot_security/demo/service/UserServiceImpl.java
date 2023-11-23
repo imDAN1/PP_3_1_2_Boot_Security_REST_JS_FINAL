@@ -33,18 +33,19 @@ public class UserServiceImpl implements UserService {
         Optional<User> opUser = usersRepository.findByUsername(username);
 
         if (opUser.isEmpty()) {
-            throw new UsernameNotFoundException(String.format("User '%s' not found", username));
+            throw new UsernameNotFoundException("User not found");
         }
         User user = opUser.get();
-
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(), mapRoleToAuthorities(user.getRoles()));
+                return new org.springframework.security.core.userdetails.User(user.getUsername(),
+                user.getPassword(), user.getAuthorities());
+//        return new User(user.getUsername(),user.getSurName(),user.getEmail(),user.getAge(),user.getPassword(),
+//                user.getRoles());
     }
 
     // метод преобразует коллекцию Role в Authority
-    private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
-    }
+//    private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles) {
+//        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
+//    }
 
     @Transactional(readOnly = true)
     @Override
