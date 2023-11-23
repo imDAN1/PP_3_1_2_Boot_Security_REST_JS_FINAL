@@ -13,23 +13,25 @@
       <th>Surname</th>
       <th>Age</th>
       <th>Email</th>
+      <th>Password</th>
+      <th>Roles</th>
     </tr>
     <tr th:each = "list : ${users}">
       <td th:utext="${list.getId()}"/>
       <td th:utext="${list.getName()}"/>
-      <td th:utext="${list.getPassword()}"/>
       <td th:utext="${list.getSurName()}"/>
       <td th:utext="${list.getAge()}"/>
       <td th:utext="${list.getEmail()}"/>
+      <td th:utext="${list.getPassword()}"/>
       <td th:utext="${list.getRoles()}"/>
       <td>
-        <form action = "#" th:action="@{/{id}/edit(id=${list.getId()})}" method = "PATCH">
+        <form action = "#" th:action="@{/admin/{id}/edit(id=${list.getId()})}" method = "PATCH">
           <input type = "submit" value = "Update">
         </form>
       </td>
 
       <td>
-        <form th:method = "DELETE" th:action="@{/{id}/delete(id=${list.getId()})}">
+        <form th:method = "DELETE" th:action="@{/admin/{id}/delete(id=${list.getId()})}">
           <input type = "submit" value = "Delete">
         </form>
       </td>

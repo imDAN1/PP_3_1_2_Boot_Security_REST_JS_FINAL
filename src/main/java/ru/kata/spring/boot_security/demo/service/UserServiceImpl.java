@@ -1,42 +1,52 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repositories.UsersRepository;
-import ru.kata.spring.boot_security.demo.security.UsersDetails;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UsersRepository usersRepository;
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UsersRepository usersRepository) {
+    public UserServiceImpl(UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
         this.usersRepository = usersRepository;
-//        this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = usersRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found!");
+        Optional<User> opUser = usersRepository.findByUsername(username);
+
+        if (opUser.isEmpty()) {
+            throw new UsernameNotFoundException(String.format("User '%s' not found", username));
         }
-        return new UsersDetails(user.get());
+        User user = opUser.get();
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+                user.getPassword(), mapRoleToAuthorities(user.getRoles()));
     }
 
-    public Optional<User> findUserNameInDB(String username) {
-        return usersRepository.findByUsername(username);
+    // метод преобразует коллекцию Role в Authority
+    private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles) {
+        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> getAllUsers() {
         return (List<User>) usersRepository.findAll();
@@ -45,6 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersRepository.save(user);
     }
 
@@ -55,7 +66,7 @@ public class UserServiceImpl implements UserService {
         if (userFromDb.getPassword().equals(user.getPassword())) {
             usersRepository.save(user);
         } else {
-            user.setPassword(user.getPassword());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             usersRepository.save(user);
         }
     }
@@ -71,11 +82,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean deleteUser(long id) {
+    public void deleteUser(long id) {
         if (usersRepository.findById(id).isPresent()) {
             usersRepository.deleteById(id);
-            return true;
         }
-        return false;
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return usersRepository.findByUsername(username).get();
     }
 }
