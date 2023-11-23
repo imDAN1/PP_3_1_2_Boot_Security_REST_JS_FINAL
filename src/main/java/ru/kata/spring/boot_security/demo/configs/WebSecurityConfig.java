@@ -28,15 +28,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/auth/login", "/auth/registration", "/error")
+                .antMatchers("/login", "/auth/registration", "/error")
                 .permitAll()
                 .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                /*
+Хотел реализовать свою страницу входа с возможностью регистрации нового пользователя
+Изучил теорию, но работать авторизация не стала почему-то
+Сохранение пользователей с выбранной ролью проходит хорошо
+В итоге оставил базовую страницу для ввода логина и пароля
+                 */
 //                .loginPage("/auth/login")
 //                .loginProcessingUrl("/process_login")
+//                .defaultSuccessUrl("/", true)
 //                .failureForwardUrl("/auth/login?error")
                 .successHandler(successUserHandler)
                 .permitAll()
@@ -44,19 +51,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login");
-//        http
-//                .authorizeRequests()
-//                .antMatchers("/", "/index").permitAll() // аутентификация не требуется
-//                .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
-//                .antMatchers("/admin/**").hasRole("ADMIN") // доступ только админу
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin().successHandler(successUserHandler) // обработчик успешной аутентификации
-//                .permitAll()
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/login");
     }
 
 //    // аутентификация inMemory
