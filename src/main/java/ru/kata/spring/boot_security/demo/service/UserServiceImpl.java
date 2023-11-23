@@ -27,35 +27,13 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> opUser = usersRepository.findByUsername(username);
-
-        if (opUser.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        User user = opUser.get();
-                return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(), user.getAuthorities());
-//        return new User(user.getUsername(),user.getSurName(),user.getEmail(),user.getAge(),user.getPassword(),
-//                user.getRoles());
-    }
-
-    // метод преобразует коллекцию Role в Authority
-//    private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles) {
-//        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
-//    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<User> getAllUsers() {
-        return (List<User>) usersRepository.findAll();
-    }
-
     @Override
     @Transactional
     public void createUser(User user) {
+        if (usersRepository.findByUsername(user.getUsername()).isPresent()) {
+            return;
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersRepository.save(user);
     }
@@ -72,8 +50,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public User readUser(long id) {
+    public List<User> getAllUsers() {
+        return (List<User>) usersRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public User readUser(Long id) {
         Optional<User> user = usersRepository.findById(id);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User with this id is not found");
@@ -83,14 +68,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(long id) {
+    public void deleteUser(Long id) {
         if (usersRepository.findById(id).isPresent()) {
             usersRepository.deleteById(id);
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User getUserByUsername(String username) {
         return usersRepository.findByUsername(username).get();
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> opUser = usersRepository.findByUsername(username);
+
+        if (opUser.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return opUser.get();
+//        User user = opUser.get();
+//                return new org.springframework.security.core.userdetails.User(user.getUsername(),
+//                user.getPassword(), user.getAuthorities());
+//        return new User(user.getUsername(),user.getSurName(),user.getEmail(),user.getAge(),user.getPassword(),
+//                user.getRoles());
+    }
+
+    // метод преобразует коллекцию Role в Authority
+
+//    private Collection<? extends GrantedAuthority> mapRoleToAuthorities(Collection<Role> roles) {
+
+//        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).toList();
+
+//    }
 }
