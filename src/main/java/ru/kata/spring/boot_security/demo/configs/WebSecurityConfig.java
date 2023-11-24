@@ -34,16 +34,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/auth/login")
-                .loginProcessingUrl("/process_login")
-                .defaultSuccessUrl("/", true)
-                .failureForwardUrl("/auth/login?error")
+//                .loginPage("/auth/login")
+//                .loginProcessingUrl("/process_login")
+//                .defaultSuccessUrl("/", true)
+//                .failureForwardUrl("/auth/login?error")
                 .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutSuccessUrl("/login");
     }
 
 //    // аутентификация inMemory
