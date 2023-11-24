@@ -10,6 +10,7 @@ import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/admin")
@@ -24,8 +25,11 @@ public class AdminsController {
     }
 
     @GetMapping
-    public String showAllUsers(Model model) {
+    public String showAllUsers(Model model, Principal principal, @ModelAttribute("user") User user) {
+        model.addAttribute("admin", userService.getUserByUsername(principal.getName()));
+        model.addAttribute("userRoles", userService.getUserByUsername(principal.getName()).getRoles());
         model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("allRoles", roleService.getAllRoles());
         return "admin/allUsers";
     }
 
@@ -53,12 +57,20 @@ public class AdminsController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") @Valid User user, @PathVariable("id") Long id,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "/admin/edit";
-        }
+    public String update(@ModelAttribute("user") @Valid User user, @PathVariable("id") Long id) {
+//        if (bindingResult.hasErrors()) {
+//            return "/admin/edit";
+//        }
         userService.updateUser(user, id);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/registration")
+    public String performRegistration(@ModelAttribute("user") @Valid User user) {
+//        if (bindingResult.hasErrors()) {
+//            return "/auth/registration";
+//        }
+        userService.createUser(user);
         return "redirect:/admin";
     }
 
