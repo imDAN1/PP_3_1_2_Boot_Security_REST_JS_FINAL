@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repositories.UsersRepository;
+import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
 import java.util.Collection;
 import java.util.List;
@@ -77,7 +78,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public User getUserByUsername(String username) {
-        return usersRepository.findByUsername(username).get();
+        Optional<User> foundUser = usersRepository.findByUsername(username);
+        return foundUser.orElseThrow(UserNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
