@@ -19,7 +19,6 @@ function getUsers() {
                 out += '<td>' + user.surName + '</td>';
                 out += '<td>' + user.age + '</td>';
                 out += '<td>' + user.email + '</td>';
-                out += '<td>' + user.password + '</td>';
                 let i, role = "";
                 for (i in user.roles) {
                     if (user.roles[i].role === "ROLE_USER") {
@@ -63,8 +62,8 @@ function getEditModal(id) {
                 document.getElementById('edit_id').value = userEdit.id;
                 document.getElementById('edit_username').value = userEdit.username;
                 document.getElementById('edit_surname').value = userEdit.surName;
-                document.getElementById('edit_age').value = userEdit.Age;
-                document.getElementById('edit_email').value = userEdit.Email;
+                document.getElementById('edit_age').value = userEdit.age;
+                document.getElementById('edit_email').value = userEdit.email;
                 document.getElementById('edit_password').value = userEdit.password;
                 document.getElementById('edit_role').value = userEdit.roles;
 
@@ -72,13 +71,13 @@ function getEditModal(id) {
                     .getElementsByTagName('option');
 
                 for (let i = 0; i < select.length; i++) {
-                    if (select[i].value === userEdit.roles[i].role) {
+                    if (select[i].value === userEdit.roles[i]) {
                         select[i].selected = true;
                         if (i === select.length - 1) {
                             break;
                         }
-                    } else if (select[i + 1].value === userEdit.roles[i].role) {
-                        select[i + 1].selected = true;
+                    } else if (select[i + 1] === userEdit.roles[i]) {
+                        select[i + 1] = true;
                     }
                 }
             })
@@ -120,7 +119,7 @@ function editUser() {
         body: JSON.stringify({
             'id': id,
             'username': username,
-            'surname': surname,
+            'surName': surname,
             'age': age,
             'email': email,
             'password': password,
@@ -128,7 +127,7 @@ function editUser() {
         })
     })
         .then(() => {
-            $('#editModal').hide();
+            $('#editModal').modal('hide');
             getUsers();
         })
 }
@@ -144,9 +143,8 @@ function getDeleteModal(id) {
             document.getElementById('delete_id').value = userDelete.id;
             document.getElementById('delete_username').value = userDelete.name;
             document.getElementById('delete_surname').value = userDelete.surName;
-            document.getElementById('delete_age').value = userDelete.Age;
-            document.getElementById('delete_email').value = userDelete.Email;
-            document.getElementById('delete_password').value = userDelete.password;
+            document.getElementById('delete_age').value = userDelete.age;
+            document.getElementById('delete_email').value = userDelete.email;
             document.getElementById('delete_role').value = userDelete.roles;
         })
     });
@@ -164,7 +162,7 @@ function deleteUser() {
 
     })
         .then(() => {
-            $('#deleteModal').hide();
+            $('#deleteModal').modal('hide');
             getUsers();
         })
 }
@@ -178,6 +176,23 @@ function addUser() {
     let password = document.getElementById('create_password').value;
     let roles = $("#create_role").val()
 
+    for (let i = 0; i < roles.length; i++) {
+        if (roles[i] === 'ROLE_ADMIN') {
+            roles[i] = {
+                'id': 1,
+                'role': 'ROLE_ADMIN',
+                "authority": "ROLE_ADMIN"
+            }
+        }
+        if (roles[i] === 'ROLE_USER') {
+            roles[i] = {
+                'id': 2,
+                'role': 'ROLE_USER',
+                "authority": "ROLE_USER"
+            }
+        }
+    }
+
     fetch(URL, {
         method: 'POST',
         headers: {
@@ -185,9 +200,9 @@ function addUser() {
         },
         body: JSON.stringify({
             'username': username,
-            'surname': surname,
+            'surName': surname,
             'age': age,
-            'email' : email,
+            'email': email,
             'password': password,
             'roles': roles
         })

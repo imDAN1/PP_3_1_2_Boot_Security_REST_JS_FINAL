@@ -71,9 +71,8 @@ public class RESTAdminController {
     }
 
     @PutMapping
-    public User update(@RequestBody User user) {
+    public void update(@RequestBody User user) {
         userService.updateUser(user, user.getId());
-        return user;
     }
 
     @DeleteMapping("/{id}")
